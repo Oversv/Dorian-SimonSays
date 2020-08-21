@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Simon says</title>
+    <link rel="stylesheet" href="/css/styles.css?t=1598005677066"/>
+  </head>
+  <body>
+    <main>
+      <div class="info" id="info">
+        <div class="info__score" id="score">
+          <p class="info__username">Alicia</p>
+          <p class="info__score">5100</p>
+          <p class="info__level">Level 5</p>
+        </div>
+        <div class="info__ranking" id="ranking">
+          <p>Pepe 6000</p>
+          <p>Alicia 5100</p>
+          <p>Susi  3000</p>
+        </div>
+      </div>
+      <div class="game" id="game">
+        <div class="game__board" id="game-board">
+          <div>
+            <div class="game__square game__square--green" id="square-green" data-value="0"></div>
+            <div class="game__square game__square--yellow" id="square-yellow" data-value="1"></div>
+          </div>
+          <div>
+            <div class="game__square game__square--red" id="square-red" data-value="3"></div>
+            <div class="game__square game__square--blue" id="square-blue" data-value="2"></div>
+          </div>
+          <div class="game__square game__square--middle" id="square-middle"><ion-icon name="play-circle-outline" class="icon" id="start-game"></ion-icon></div>
+        </div>
+      </div>
+      <form class="form" id="simon-form">
+        <select class="form__field" name="difficulty">
+          <option value="normal">Normal</option>
+          <option value="hard">Hard</option>
+          <option value="epic">Epic</option>
+        </select>
+        <input class="form__field" type="text" placeholder="e.g. Paco"/>
+      </form>
+    </main><script type="module" src="https://unpkg.com/ionicons@5.1.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule="" src="https://unpkg.com/ionicons@5.1.2/dist/ionicons/ionicons.js"></script>
+    <script src="js/scripts.js?t=1598005677066"></script>
+  </body>
+</html>

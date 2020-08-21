@@ -1,0 +1,14 @@
+*,
+*::before, 
+*::after {
+    font-family: Helvetica, sans-serif;  
+    box-sizing: border-box;   
+}
+
+body{
+    margin: 0px
+}
+main{
+    background-color: turquoise;
+    height: 100vh;
+}

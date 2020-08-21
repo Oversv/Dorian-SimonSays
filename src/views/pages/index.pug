@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Simon says
+        link(rel="stylesheet", href="/css/styles.css")
+    body
+        main
+            #info.info
+                #score.info__score
+                    p.info__username Alicia
+                    p.info__score 5100
+                    p.info__level Level 5
+                #ranking.info__ranking
+                    p Pepe 6000
+                    p Alicia 5100
+                    p Susi  3000
+            #game.game
+                #game-board.game__board
+                    div
+                        #square-green.game__square.game__square--green(data-value=0)
+                        #square-yellow.game__square.game__square--yellow(data-value=1)
+                    div
+                        #square-red.game__square.game__square--red(data-value=3)
+                        #square-blue.game__square.game__square--blue(data-value=2)
+                    #square-middle.game__square.game__square--middle
+                        <ion-icon name="play-circle-outline" class="icon" id="start-game"></ion-icon>
+            form#simon-form.form
+                select(name="difficulty").form__field
+                    option(value="normal") Normal
+                    option(value="hard") Hard
+                    option(value="epic") Epic
+                input(type="text" placeholder="e.g. Paco").form__field  
+        <script type="module" src="https://unpkg.com/ionicons@5.1.2/dist/ionicons/ionicons.esm.js"></script>
+        <script nomodule="" src="https://unpkg.com/ionicons@5.1.2/dist/ionicons/ionicons.js"></script>
+        script(src="js/scripts.js")
