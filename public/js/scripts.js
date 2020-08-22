@@ -13,21 +13,14 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToAr
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 var boardColors = Array.from(document.querySelectorAll('.game__square')).slice(0, 4);
+var btnStartGame = document.getElementById('start-game');
+var gameDifficulty = document.getElementById('game-difficulty');
+var formName = document.getElementById('form-name');
+var infoScore = document.getElementById('info-score');
 var game = {
-  //!Revisar como usar el tema de la difficultad
   difficulty: {
-    normal: {
-      time: 1000,
-      multiplier: 1
-    },
-    hard: {
-      time: 800,
-      multiplier: 1.2
-    },
-    epic: {
-      time: 600,
-      multiplier: 1.4
-    }
+    time: 1000,
+    multiplier: 1
   },
   sequence: [],
   playing: false,
@@ -38,6 +31,7 @@ var game = {
     score: 0
   },
   level: 1,
+  scoreBase: 10,
   ranking: []
 };
 /**
@@ -58,15 +52,15 @@ var sequence = function sequence(arr) {
 
 
 var activeColor = function activeColor(number) {
+  var time = game.difficulty.time / 2;
   boardColors.forEach(function (e) {
     if (e.getAttribute('data-value') == number) {
-      //!Aqui es el problema, hay que pasarle de uno en uno lo que tiene que iluminar, seguramente hacerlo en el startgame
       e.classList.add('active');
     }
 
     setTimeout(function () {
       e.classList.remove('active');
-    }, 500); //TODO dependerá de la dificultad
+    }, time);
   });
 };
 
@@ -78,16 +72,18 @@ var checkSequence = function checkSequence(simonSequence, userSequence) {
   return simon === user;
 };
 /**
- * * Fill de array of game.sequence, 1 number per level. 1 level = [n], 2 level = [n,n] ... 
+ * * Fill de array of game.sequence, with 1 number per level. Level 1 = [n], Level 2 = [n,n] ... 
  */
 
 
 var startRound = function startRound() {
-  var time = 1000; //Todo irá la dificultad seleccionada
-
+  var infoLevel = document.getElementById('info-level');
+  var time = game.difficulty.time;
+  var sequenceLength;
   var count = 0;
   game.sequence = sequence(game.sequence);
-  var sequenceLength = game.sequence.length;
+  sequenceLength = game.sequence.length;
+  infoLevel.textContent = "Level ".concat(game.level);
 
   (function loop(sequenceLength) {
     setTimeout(function () {
@@ -97,45 +93,118 @@ var startRound = function startRound() {
         loop(sequenceLength);
     }, time);
   })(sequenceLength);
-}; //TODO  deshabilitar este boton cuando el juego está en proceso
+};
 
+var selectDifficulty = function selectDifficulty() {
+  var selectDifficulty = document.getElementById('game-difficulty').value;
+  var result;
 
-var startGame = document.getElementById('start-game');
-startGame.addEventListener('click', function () {
-  startRound();
-}); //TODO hacer que el juego pase de rondas
-//TODO hacer juego terminado
-//TODO nombre de usuario
-//TODO multiplicador para el score
-//TODO ranking
-//TODO el nivel de dificultad
-//TODO los sonidos
+  switch (selectDifficulty) {
+    case 'hard':
+      game.difficulty = {
+        time: 700,
+        multiplier: 1.3
+      };
+      result = game.difficulty;
+      break;
+
+    case 'epic':
+      game.difficulty = {
+        time: 500,
+        multiplier: 1.5
+      };
+      result = game.difficulty;
+      break;
+
+    default:
+      game.difficulty = {
+        time: 1000,
+        multiplier: 1
+      };
+      result = game.difficulty;
+      break;
+  }
+
+  return result;
+};
 
 var reset = function reset() {
   game.user.sequence = [];
 };
 
+var endGame = function endGame() {
+  game.sequence = [];
+  game.user.sequence = [];
+  game.user.score = 0;
+  game.compareSequence = true;
+  game.level = 1;
+  game.playing = false;
+  btnStartGame.removeAttribute('disabled');
+  btnStartGame.classList.remove('game__button--disabled');
+  gameDifficulty.removeAttribute('disabled');
+};
+
+var updateScore = function updateScore() {
+  game.user.score += game.scoreBase * game.difficulty.multiplier;
+  infoScore.textContent = game.user.score.toString().padStart(6, '0');
+};
+
+btnStartGame.addEventListener('click', function () {
+  var error = document.getElementById('error');
+  infoScore.textContent = game.user.score.toString().padStart(6, '0');
+
+  if (formName.value.length === 0) {
+    error.classList.remove('error--hide');
+    formName.focus();
+  } else {
+    error.classList.add('error--hide');
+
+    if (!game.playing) {
+      startRound();
+      game.playing = true;
+      btnStartGame.setAttribute('disabled', '');
+      btnStartGame.classList.add('game__button--disabled');
+      gameDifficulty.setAttribute('disabled', '');
+    }
+  }
+}); //TODO ranking
+//TODO los sonidos
+
 var board = document.getElementById('game-board');
 board.addEventListener('click', function (e) {
   if (game.compareSequence) {
     if (e.target.getAttribute('data-value')) {
-      game.user.sequence.push(Number(e.target.getAttribute('data-value')));
-      game.compareSequence = checkSequence(game.sequence, game.user.sequence); //console.log(e.target.getAttribute('data-value')) 
+      var colorPressed = Number(e.target.getAttribute('data-value'));
+      game.user.sequence.push(colorPressed);
+      game.compareSequence = checkSequence(game.sequence, game.user.sequence);
+      activeColor(colorPressed);
+
+      if (game.compareSequence) {
+        updateScore();
+      }
 
       if (game.compareSequence && game.sequence.length === game.user.sequence.length) {
-        console.log("siguiente ronda");
+        console.log("Next Round");
         reset();
-        game.level++;
-        startRound();
+        game.level++; //Delay between rounds
+
+        setTimeout(startRound, 1000);
       }
 
       if (!game.compareSequence) {
         console.log('Erroorrrrr');
-        game.sequence = [];
-        game.user.sequence = [];
-        game.compareSequence = true;
-        game.level = 1;
+        endGame();
       }
     }
+  }
+});
+formName.addEventListener('change', function () {
+  var infoUsername = document.getElementById('info-username');
+  game.user.username = formName.value;
+  infoUsername.textContent = game.user.username;
+});
+gameDifficulty.addEventListener('change', function () {
+  if (!game.playing) {
+    selectDifficulty();
   }
 });

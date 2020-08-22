@@ -1,18 +1,12 @@
 const boardColors = Array.from(document.querySelectorAll('.game__square')).slice(0,4)
-const game = { //!Revisar como usar el tema de la difficultad
-    difficulty:{
-        normal: {
-            time: 1000,
-            multiplier: 1 
-        },
-        hard: {
-            time: 800,
-            multiplier: 1.2
-        },
-        epic: {
-            time: 600,
-            multiplier: 1.4
-        }
+const btnStartGame = document.getElementById('start-game')
+const gameDifficulty = document.getElementById('game-difficulty')
+const formName = document.getElementById('form-name')
+const infoScore = document.getElementById('info-score')
+const game = { 
+    difficulty:{        
+        time: 1000,
+        multiplier: 1
     },
     sequence: [],    
     playing: false,
@@ -23,6 +17,7 @@ const game = { //!Revisar como usar el tema de la difficultad
         score: 0
     },    
     level: 1,
+    scoreBase: 10,
     ranking: []
 }
 /**
@@ -41,16 +36,16 @@ const sequence = (arr) =>{
 
  */
 const activeColor = (number) =>{
-    
+    const time = game.difficulty.time / 2  
+
     boardColors.forEach((e) => {  
         
-        if(e.getAttribute('data-value') == number){ //!Aqui es el problema, hay que pasarle de uno en uno lo que tiene que iluminar, seguramente hacerlo en el startgame
-            
+        if(e.getAttribute('data-value') == number){ 
             e.classList.add('active')            
         }
         setTimeout(()=>{
             e.classList.remove('active')            
-        }, 500) //TODO dependerá de la dificultad
+        }, time) 
            
     }); 
 }
@@ -64,14 +59,17 @@ const checkSequence = (simonSequence, userSequence) =>{
 }
 
 /**
- * * Fill de array of game.sequence, 1 number per level. 1 level = [n], 2 level = [n,n] ... 
+ * * Fill de array of game.sequence, with 1 number per level. Level 1 = [n], Level 2 = [n,n] ... 
  */
 const startRound = () =>{
-    const time = 1000; //Todo irá la dificultad seleccionada
+    const infoLevel = document.getElementById('info-level')    
+    const time = game.difficulty.time;  
+    let sequenceLength
     let count = 0;
-    game.sequence = sequence(game.sequence);
-    
-    const sequenceLength = game.sequence.length;
+
+    game.sequence = sequence(game.sequence);    
+    sequenceLength = game.sequence.length;
+    infoLevel.textContent = `Level ${game.level}`;
 
     (function loop(sequenceLength) { 
 
@@ -87,54 +85,132 @@ const startRound = () =>{
     })(sequenceLength);    
 
 }
+const selectDifficulty = () =>{
+    const selectDifficulty = document.getElementById('game-difficulty').value
+    let result
 
-//TODO  deshabilitar este boton cuando el juego está en proceso
-const startGame = document.getElementById('start-game')
-startGame.addEventListener('click', ()=>{
-    startRound()
-})
-//TODO hacer que el juego pase de rondas
-//TODO hacer juego terminado
-//TODO nombre de usuario
-//TODO multiplicador para el score
-//TODO ranking
-//TODO el nivel de dificultad
-//TODO los sonidos
+    switch (selectDifficulty) {
 
-const reset = () =>{
-    game.user.sequence = []
+        case 'hard':
+            game.difficulty = {
+                time: 700,
+                multiplier: 1.3
+            }
+
+            result = game.difficulty
+            break;
+
+        case 'epic':
+            game.difficulty = {
+                time: 500,
+                multiplier: 1.5
+            }
+
+            result = game.difficulty
+            break;
+
+        default:
+            game.difficulty = {
+                time: 1000,
+                multiplier: 1
+            }
+
+            result = game.difficulty
+          break;
+    }    
+    return result
 }
 
-const board = document.getElementById('game-board')
 
+const reset = () =>{
+    game.user.sequence = []   
+}
+const endGame = () =>{
+    game.sequence = []
+    game.user.sequence = []
+    game.user.score = 0
+    game.compareSequence = true
+    game.level = 1
+    game.playing = false    
+    btnStartGame.removeAttribute('disabled')
+    btnStartGame.classList.remove('game__button--disabled')
+    gameDifficulty.removeAttribute('disabled')    
+}
+const updateScore = () =>{   
+
+    game.user.score += game.scoreBase * game.difficulty.multiplier
+    infoScore.textContent = game.user.score.toString().padStart(6, '0')
+}
+
+btnStartGame.addEventListener('click', ()=>{
+    const error = document.getElementById('error')
+    infoScore.textContent = game.user.score.toString().padStart(6, '0')
+
+    if(formName.value.length === 0){
+        error.classList.remove('error--hide')
+        formName.focus()
+    }else{
+        error.classList.add('error--hide')
+        if(!game.playing){
+            
+            startRound()
+            game.playing = true
+            btnStartGame.setAttribute('disabled', '')
+            btnStartGame.classList.add('game__button--disabled')
+            gameDifficulty.setAttribute('disabled', '')
+        }
+    }
+})
+
+//TODO ranking
+//TODO los sonidos
+
+const board = document.getElementById('game-board')
 board.addEventListener('click', (e)=>{    
 
     if(game.compareSequence){
        
         if(e.target.getAttribute('data-value')){
-            game.user.sequence.push(Number(e.target.getAttribute('data-value')))           
+            const colorPressed = Number(e.target.getAttribute('data-value'))
+
+            game.user.sequence.push(colorPressed)           
             game.compareSequence = checkSequence(game.sequence, game.user.sequence)
-            
-            //console.log(e.target.getAttribute('data-value')) 
+            activeColor(colorPressed)
+
+            if(game.compareSequence){
+                updateScore()
+            }
 
             if(game.compareSequence && game.sequence.length === game.user.sequence.length){
-                console.log("siguiente ronda")
+                console.log("Next Round")
 
                 reset()
                 game.level++
-                startRound()
-                
+                //Delay between rounds
+                setTimeout(startRound, 1000)
             }
 
             if(!game.compareSequence){
-                console.log('Erroorrrrr')
-                
-                game.sequence = []
-                game.user.sequence = []
-                game.compareSequence = true
-                game.level = 1
+                console.log('Erroorrrrr')                
+                endGame()
             }
         }
     }
 })
 
+
+formName.addEventListener('change', ()=>{
+
+    const infoUsername = document.getElementById('info-username')
+
+    game.user.username = formName.value
+    infoUsername.textContent = game.user.username
+})
+
+
+gameDifficulty.addEventListener('change', ()=>{    
+    
+    if(!game.playing){        
+        selectDifficulty()      
+    }   
+})
