@@ -13,10 +13,7 @@ html(lang="en")
                     p#info-username.info__username Your name
                     p#info-score.info__score 000000
                     p#info-level.info__level Level 1
-                #ranking.info__ranking
-                    p Pepe 6000
-                    p Alicia 5100
-                    p Susi  3000
+                #ranking.info__ranking                
             #game.game
                 #game-board.game__board
                     div
@@ -36,6 +33,10 @@ html(lang="en")
                     option(value="normal") Normal
                     option(value="hard") Hard
                     option(value="epic") Epic
+            #modal.modal       
+                #modal-content.modal__content
+                    #modal-ranking
+                    #modal-close.modal__close +
         <script type="module" src="https://unpkg.com/ionicons@5.1.2/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule="" src="https://unpkg.com/ionicons@5.1.2/dist/ionicons/ionicons.js"></script>
         script(src="js/scripts.js")

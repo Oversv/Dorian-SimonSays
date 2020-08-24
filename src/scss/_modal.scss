@@ -1,0 +1,33 @@
+.modal{
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,.7); /* important use alpha */
+    transform: scale(0);
+    transition: transform .3s;
+}
+.modal--show{
+    transform: scale(1);
+}
+.modal__content{
+    position: relative; /* important for the situation of modal__close */
+    width: 500px;
+    height: 500px;
+    padding: 10px;   
+    background-color: white;    
+}
+.modal__close{
+    position: absolute;
+    top: 0;
+    right: 0;    
+    font-size: 2em;
+    color: red;
+    font-weight: bold;
+    transform: rotate(45deg);
+    cursor: pointer;
+}

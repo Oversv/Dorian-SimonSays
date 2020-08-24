@@ -18,6 +18,7 @@ var gameDifficulty = document.getElementById('game-difficulty');
 var formName = document.getElementById('form-name');
 var infoScore = document.getElementById('info-score');
 var game = {
+  id: '',
   difficulty: {
     time: 1000,
     multiplier: 1
@@ -47,7 +48,8 @@ var sequence = function sequence(arr) {
   return newArr;
 };
 /**
-
+ * * Iluminate the button 
+ * @param {number} number 
  */
 
 
@@ -63,6 +65,12 @@ var activeColor = function activeColor(number) {
     }, time);
   });
 };
+/**
+ * * Check the Simon sequence with the user and return true if both are equals and false if are different
+ * @param {array} simonSequence array with Simon sequence
+ * @param {array} userSequence array with user sequence
+ */
+
 
 var checkSequence = function checkSequence(simonSequence, userSequence) {
   var _long = game.user.sequence.length - 1;
@@ -94,6 +102,10 @@ var startRound = function startRound() {
     }, time);
   })(sequenceLength);
 };
+/**
+ *  *Change the difficulty of the game
+ */
+
 
 var selectDifficulty = function selectDifficulty() {
   var selectDifficulty = document.getElementById('game-difficulty').value;
@@ -127,10 +139,18 @@ var selectDifficulty = function selectDifficulty() {
 
   return result;
 };
+/**
+ * * Reset the user sequence when finish de round
+ */
+
 
 var reset = function reset() {
   game.user.sequence = [];
 };
+/**
+ * * Reset all parameters of the game
+ */
+
 
 var endGame = function endGame() {
   game.sequence = [];
@@ -143,17 +163,117 @@ var endGame = function endGame() {
   btnStartGame.classList.remove('game__button--disabled');
   gameDifficulty.removeAttribute('disabled');
 };
+/**
+ * *Upadete the score when finish each round
+ */
+
 
 var updateScore = function updateScore() {
   game.user.score += game.scoreBase * game.difficulty.multiplier;
   infoScore.textContent = game.user.score.toString().padStart(6, '0');
 };
+/**
+ * * Save in the local storage the ranking of the user, save(id, username, level, score and date) for each round
+ * @param {object} game The object when the game save all parameters 
+ */
+
+
+var saveRanking = function saveRanking(game) {
+  var myDate = new Date();
+  var day = myDate.getDate();
+  var month = myDate.getMonth() + 1;
+  var year = myDate.getFullYear();
+  var userRanking = {
+    id: game.id,
+    username: game.user.username,
+    level: game.level,
+    score: game.user.score,
+    date: "".concat(day, "/").concat(month, "/").concat(year)
+  };
+
+  if (JSON.parse(localStorage.getItem('simonRanking')) === null) {
+    localStorage.setItem('simonRanking', JSON.stringify([]));
+  }
+
+  var allLocalStorage = JSON.parse(localStorage.getItem('simonRanking'));
+  var newLocalStorage = allLocalStorage.filter(function (e) {
+    return e.id !== game.id;
+  });
+  newLocalStorage.push(userRanking);
+  localStorage.setItem('simonRanking', JSON.stringify(newLocalStorage));
+};
+/**
+ * * Order the local storage for levels and scores, and show
+ */
+
+
+var showRanking = function showRanking() {
+  var ranking = document.getElementById('ranking');
+  var fragment = document.createDocumentFragment();
+  var rankingItems = 3;
+  ranking.innerHTML = '';
+
+  if (JSON.parse(localStorage.getItem('simonRanking')) !== null) {
+    var allLocalStorage = JSON.parse(localStorage.getItem('simonRanking')).sort(function (a, b) {
+      return b.level - a.level || b.score - a.score;
+    });
+
+    if (allLocalStorage.length < 3) {
+      rankingItems = allLocalStorage.length;
+    }
+
+    for (var i = 0; i < rankingItems; i++) {
+      var p = document.createElement('p');
+      p.textContent = "\n                ".concat(i + 1, "\xBA ").concat(allLocalStorage[i].username, " - Level ").concat(allLocalStorage[i].level, "\n            ");
+      fragment.appendChild(p);
+    }
+
+    var button = document.createElement('button');
+    button.textContent = 'See More';
+    button.setAttribute('id', 'ranking-details');
+    button.setAttribute('onclick', 'showModal()');
+    fragment.appendChild(button);
+    ranking.appendChild(fragment);
+  }
+};
+/**
+ * * Show the modal and create the content
+ */
+
+
+var showModal = function showModal() {
+  var allLocalStorage = JSON.parse(localStorage.getItem('simonRanking')).sort(function (a, b) {
+    return b.level - a.level || b.score - a.score;
+  });
+  var modal = document.getElementById('modal');
+  var modalRanking = document.getElementById('modal-ranking');
+  var fragment = document.createDocumentFragment();
+  var rankingItems = 50;
+  modal.classList.add('modal--show');
+  modalRanking.innerHTML = '';
+
+  if (allLocalStorage.length < 50) {
+    rankingItems = allLocalStorage.length;
+  }
+
+  for (var i = 0; i < rankingItems; i++) {
+    var p = document.createElement('p');
+    p.textContent = "\n            ".concat(i + 1, "\xBA ").concat(allLocalStorage[i].username, " - Level ").concat(allLocalStorage[i].level, " - Score ").concat(allLocalStorage[i].score, " - Date ").concat(allLocalStorage[i].date, " \n        ");
+    fragment.appendChild(p);
+  }
+
+  modalRanking.appendChild(fragment);
+};
+/******************** 
+  *** Listeners *** 
+ *******************/
+
 
 btnStartGame.addEventListener('click', function () {
   var error = document.getElementById('error');
   infoScore.textContent = game.user.score.toString().padStart(6, '0');
 
-  if (formName.value.length === 0) {
+  if (formName.value.trim().length === 0) {
     error.classList.remove('error--hide');
     formName.focus();
   } else {
@@ -161,50 +281,61 @@ btnStartGame.addEventListener('click', function () {
 
     if (!game.playing) {
       startRound();
+      game.id = Date.now();
       game.playing = true;
       btnStartGame.setAttribute('disabled', '');
       btnStartGame.classList.add('game__button--disabled');
       gameDifficulty.setAttribute('disabled', '');
     }
   }
-}); //TODO ranking
-//TODO los sonidos
+}); //TODO los sonidos
+//TODO mirar de meter un grid en la modal y añadir la difiucultad, añadir el scroll para la modal mirar el log the piedra papel
 
 var board = document.getElementById('game-board');
 board.addEventListener('click', function (e) {
-  if (game.compareSequence) {
-    if (e.target.getAttribute('data-value')) {
-      var colorPressed = Number(e.target.getAttribute('data-value'));
-      game.user.sequence.push(colorPressed);
-      game.compareSequence = checkSequence(game.sequence, game.user.sequence);
-      activeColor(colorPressed);
+  // if(game.compareSequence){ //! Creo que no hace falta
+  if (e.target.getAttribute('data-value')) {
+    var colorPressed = Number(e.target.getAttribute('data-value'));
+    game.user.sequence.push(colorPressed);
+    game.compareSequence = checkSequence(game.sequence, game.user.sequence);
+    activeColor(colorPressed);
 
-      if (game.compareSequence) {
-        updateScore();
-      }
+    if (game.compareSequence) {
+      updateScore();
+    } //Next Round
 
-      if (game.compareSequence && game.sequence.length === game.user.sequence.length) {
-        console.log("Next Round");
-        reset();
-        game.level++; //Delay between rounds
 
-        setTimeout(startRound, 1000);
-      }
+    if (game.compareSequence && game.sequence.length === game.user.sequence.length) {
+      console.log("Next Round");
+      saveRanking(game);
+      showRanking();
+      reset();
+      game.level++; //Delay between rounds
 
-      if (!game.compareSequence) {
-        console.log('Erroorrrrr');
-        endGame();
-      }
+      setTimeout(startRound, 1000);
+    } //Eror and game over :(
+
+
+    if (!game.compareSequence) {
+      console.log('Error');
+      endGame();
     }
-  }
+  } // }
+
 });
 formName.addEventListener('change', function () {
   var infoUsername = document.getElementById('info-username');
-  game.user.username = formName.value;
+  game.user.username = formName.value.trim();
   infoUsername.textContent = game.user.username;
 });
 gameDifficulty.addEventListener('change', function () {
   if (!game.playing) {
     selectDifficulty();
   }
+}); //Close Modal
+
+var modalClose = document.getElementById('modal-close');
+modalClose.addEventListener('click', function () {
+  return modal.classList.remove('modal--show');
 });
+showRanking();
