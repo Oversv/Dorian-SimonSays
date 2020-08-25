@@ -2,16 +2,30 @@
     display: flex;
     justify-content: space-between;
     padding: 0 30px;
-    background-color: tomato;
+    color: $first;
+    font-weight: bold;
+    
+    &__button-container{             
+        text-align: center;
+    }
+
+    &__button{
+        background-color: $first;
+        color: $third;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 6px;
+    }
 }
 
 .game{
     width: 100%;
-    height: 600px;
+    //height: 500px;
+    margin: 10px 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: skyblue;
+  
 
     &__board{
         display: flex;        
@@ -62,23 +76,19 @@
     &__button{
         background-color: transparent;
         border: none;
-        color: white;
+        color: $third;
         cursor: pointer;
 
         &--disabled{
             color: transparent;
             cursor: not-allowed;           
-        }
-        
+        }        
     }
-
 }
 .icon{
-
-    font-size: 128px;
-    
-    //TODO mirar de meterle un efecto cuando se hace click, y ponerlo en disabled cuando está en funcionamiento    
+    font-size: 128px;   
 }
+
 .active{
     filter: brightness(200%);
 }
@@ -87,15 +97,22 @@
     display: flex;
     flex-direction: column;
     align-items: center;    
-    
+    margin-top: 20px;
+
+    &__label{
+        color: $first;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
     &__field{
         width: 200px;
         height: 30px;
         margin: 5px 0;
-    }
-    &__select{
-        color: red;
-    }    
+        border-radius: 6px;
+        background-color: $third;
+        color: $first;       
+    } 
 }
 .error{
     position: fixed;
@@ -112,5 +129,27 @@
         display: none;
     }
     
+}
+.message{    
+    position: fixed;
+    background-color: green;
+    color: $third;
+    font-size: 20px;
+    font-weight: bold;
+    width: 100%;
+    height: 30px;
+    padding: 5px;
+    text-align: center;
+    font-weight: bold;
+    display: none;
+ 
 
+    &--round{       
+        display: block;
+    }
+    &--end{
+        background-color: red;
+        color: white;
+        display: block;
+    }
 }

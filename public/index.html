@@ -4,10 +4,12 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Simon says</title>
-    <link rel="stylesheet" href="/css/styles.css?t=1598268955393"/>
+    <link rel="stylesheet" href="/css/styles.css?t=1598383183547"/>
+    <link rel="shortcut icon" href="#"/>
   </head>
   <body>
-    <div class="error error--hide" id="error">Write your name</div>
+    <div class="error error--hide" id="error">Write your name maximun 10 characters</div>
+    <div class="message" id="message">                         </div>
     <main>
       <div class="info" id="info">
         <div class="info__score" id="score">
@@ -15,9 +17,9 @@
           <p class="info__score" id="info-score">000000</p>
           <p class="info__level" id="info-level">Level 1</p>
         </div>
-        <div class="info__ranking" id="ranking">               </div>
+        <div class="info__ranking" id="ranking"> </div>
       </div>
-      <div class="game" id="game">
+      <div class="game" id="game">               
         <div class="game__board" id="game-board">
           <div>
             <div class="game__square game__square--green" id="square-green" data-value="0"></div>
@@ -27,16 +29,15 @@
             <div class="game__square game__square--red" id="square-red" data-value="3"></div>
             <div class="game__square game__square--blue" id="square-blue" data-value="2"></div>
           </div>
-          <div class="game__square game__square--middle" id="square-middle">
-            <!--<ion-icon name="play-circle-outline" class="icon" id="start-game"></ion-icon>-->
+          <div class="game__square game__square--middle" id="square-middle">                       
             <button class="game__button" id="start-game"><ion-icon name="play-circle-outline" class="icon"></ion-icon></button>
           </div>
         </div>
       </div>
       <form class="form" id="simon-form">
-        <label for="form-name">Username</label>
+        <label class="form__label" for="form-name">Username</label>
         <input class="form__field" type="text" placeholder="e.g. Paco" id="form-name"/>
-        <label for="game-difficulty">Difficulty</label>
+        <label class="form__label" for="game-difficulty">Difficulty</label>
         <select class="form__field form__select" id="game-difficulty" name="difficulty">
           <option value="normal">Normal</option>
           <option value="hard">Hard</option>
@@ -45,12 +46,12 @@
       </form>
       <div class="modal" id="modal">      
         <div class="modal__content" id="modal-content">
-          <div id="modal-ranking"></div>
+          <div class="modal__ranking" id="modal-ranking"></div>
           <div class="modal__close" id="modal-close">+</div>
         </div>
       </div>
     </main><script type="module" src="https://unpkg.com/ionicons@5.1.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule="" src="https://unpkg.com/ionicons@5.1.2/dist/ionicons/ionicons.js"></script>
-    <script src="js/scripts.js?t=1598268955393"></script>
+    <script src="js/scripts.js?t=1598383183547"></script>
   </body>
 </html>

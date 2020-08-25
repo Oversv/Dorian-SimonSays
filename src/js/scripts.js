@@ -3,17 +3,21 @@ const btnStartGame = document.getElementById('start-game')
 const gameDifficulty = document.getElementById('game-difficulty')
 const formName = document.getElementById('form-name')
 const infoScore = document.getElementById('info-score')
+const board = document.getElementById('game-board')
+const modalClose = document.getElementById('modal-close')
 const game = { 
     id: '',
     difficulty:{        
         time: 1000,
         multiplier: 1
     },
-    sequence: [],    
+    sequence: [], 
+    audio: ['green.wav', 'yellow.wav', 'blue.wav', 'red.wav'],   
     playing: false,
     compareSequence: true,
     user: {
         username: '',
+        userTurn: false,
         sequence: [],
         score: 0
     },    
@@ -37,7 +41,7 @@ const sequence = (arr) =>{
  * * Iluminate the button 
  * @param {number} number 
  */
-const activeColor = (number) =>{
+const activeColor = number =>{
     const time = game.difficulty.time / 2  
 
     boardColors.forEach((e) => {  
@@ -51,6 +55,14 @@ const activeColor = (number) =>{
            
     }); 
 }
+/**
+ * * Play the audio
+ * @param {number} audio is a number with the position of the audio in the array
+ */
+const playAudio = audio =>{ 
+    return new Audio(`audio/${game.audio[audio]}`).play()
+}
+
 /**
  * * Check the Simon sequence with the user and return true if both are equals and false if are different
  * @param {array} simonSequence array with Simon sequence
@@ -76,16 +88,19 @@ const startRound = () =>{
     game.sequence = sequence(game.sequence);    
     sequenceLength = game.sequence.length;
     infoLevel.textContent = `Level ${game.level}`;
+    game.user.userTurn = false; //Block the user turn
 
     (function loop(sequenceLength) { 
 
         setTimeout(()=> {   
             activeColor(game.sequence[count]);
-            count++
+            playAudio(game.sequence[count])
+            count++;
 
-            if(--sequenceLength) //When rounds is != 0 the condition is true 
-                loop(sequenceLength);
-            
+            (--sequenceLength)
+                ? loop(sequenceLength)
+                : game.user.userTurn = true 
+
         }, time)
        
     })(sequenceLength);
@@ -134,7 +149,7 @@ const selectDifficulty = () =>{
  * * Reset the user sequence when finish de round
  */
 const reset = () =>{
-    game.user.sequence = []   
+    game.user.sequence = []      
 }
 
 /**
@@ -153,7 +168,7 @@ const endGame = () =>{
 }
 
 /**
- * *Upadete the score when finish each round
+ * * Upadete the score when finish each round
  */
 const updateScore = () =>{
     game.user.score += game.scoreBase * game.difficulty.multiplier
@@ -188,7 +203,7 @@ const saveRanking = (game) =>{
     localStorage.setItem('simonRanking', JSON.stringify(newLocalStorage))
 }
 /**
- * * Order the local storage for levels and scores, and show
+ * * Order the local storage for levels and scores, and show it
  */
 const showRanking = () =>{
     const ranking = document.getElementById('ranking')
@@ -213,13 +228,17 @@ const showRanking = () =>{
             `
             fragment.appendChild(p)
         }
+        const div = document.createElement('div')
+        div.setAttribute('class', 'info__button-container')
 
         const button = document.createElement('button')
         button.textContent = 'See More'
         button.setAttribute('id', 'ranking-details')
+        button.setAttribute('class', 'info__button')
         button.setAttribute('onclick','showModal()')
 
-        fragment.appendChild(button)        
+        div.appendChild(button)
+        fragment.appendChild(div)        
         ranking.appendChild(fragment)
     }
 }
@@ -236,31 +255,71 @@ const showModal = () =>{
     modal.classList.add('modal--show')
     modalRanking.innerHTML = ''
 
+    const gridColumnsNames = ['Pos', 'Name', 'Lvl', 'Score', 'Date']
+
+    gridColumnsNames.forEach(e =>{
+        const p = document.createElement('p')
+        p.textContent = e 
+        p.setAttribute('class', 'modal__title')
+        fragment.appendChild(p) 
+    })
+
     if(allLocalStorage.length < 50){           
         rankingItems = allLocalStorage.length
     }
 
     for(let i = 0; i < rankingItems; i++){
-        const p = document.createElement('p')         
-       
-        p.textContent=`
-            ${i+1}º ${allLocalStorage[i].username} - Level ${allLocalStorage[i].level} - Score ${allLocalStorage[i].score} - Date ${allLocalStorage[i].date} 
-        `
-        fragment.appendChild(p)
+
+        const col1 = document.createElement('p')
+        const col2 = document.createElement('p')    
+        const col3 = document.createElement('p')    
+        const col4 = document.createElement('p')          
+        const col5 = document.createElement('p') 
+
+        col1.textContent = `${i+1}º`
+        col2.textContent = allLocalStorage[i].username
+        col3.textContent = allLocalStorage[i].level
+        col4.textContent = allLocalStorage[i].score
+        col5.textContent = allLocalStorage[i].date
+
+        fragment.appendChild(col1)
+        fragment.appendChild(col2)
+        fragment.appendChild(col3)
+        fragment.appendChild(col4)
+        fragment.appendChild(col5)
     }
     
     modalRanking.appendChild(fragment)
 }
 
+const showMessage = text =>{
+   
+    const message = document.getElementById('message')    
+    let messageType = ""
+
+    message.textContent = text;   
+
+    (text === "Next Round!!")
+        ? messageType = "message--round"
+        : messageType = "message--end"
+
+    
+    message.classList.add(messageType)
+
+    setTimeout(()=>{
+        message.classList.remove(messageType)
+    }, 1000)
+
+}
 /******************** 
   *** Listeners *** 
  *******************/
 btnStartGame.addEventListener('click', ()=>{
 
     const error = document.getElementById('error')
-    infoScore.textContent = game.user.score.toString().padStart(6, '0')
+    infoScore.textContent = game.user.score.toString().padStart(6, '0')    
 
-    if(formName.value.trim().length === 0){
+    if(formName.value.trim().length === 0 || formName.value.trim().length > 10){
         error.classList.remove('error--hide')
         formName.focus()
     }else{
@@ -269,7 +328,7 @@ btnStartGame.addEventListener('click', ()=>{
         if(!game.playing){            
             startRound()
             game.id = Date.now()
-            game.playing = true
+            game.playing = true            
             btnStartGame.setAttribute('disabled', '')
             btnStartGame.classList.add('game__button--disabled')
             gameDifficulty.setAttribute('disabled', '')
@@ -277,13 +336,10 @@ btnStartGame.addEventListener('click', ()=>{
     }
 })
 
-//TODO los sonidos
-//TODO mirar de meter un grid en la modal y añadir la difiucultad, añadir el scroll para la modal mirar el log the piedra papel
-
-const board = document.getElementById('game-board')
 board.addEventListener('click', (e)=>{    
     
-   // if(game.compareSequence){ //! Creo que no hace falta
+    //Only when is the turn of the user
+    if(game.user.userTurn){
        
         if(e.target.getAttribute('data-value')){
             const colorPressed = Number(e.target.getAttribute('data-value'))
@@ -291,6 +347,7 @@ board.addEventListener('click', (e)=>{
             game.user.sequence.push(colorPressed)           
             game.compareSequence = checkSequence(game.sequence, game.user.sequence)
             activeColor(colorPressed)
+            playAudio(colorPressed)
 
             if(game.compareSequence){
                 updateScore()              
@@ -298,22 +355,23 @@ board.addEventListener('click', (e)=>{
 
             //Next Round
             if(game.compareSequence && game.sequence.length === game.user.sequence.length){
-                console.log("Next Round")
+               
                 saveRanking(game)
                 showRanking()
                 reset()
-                game.level++
+                showMessage('Next Round!!')
+                game.level++               
                 //Delay between rounds
                 setTimeout(startRound, 1000)
             }
 
             //Eror and game over :(
-            if(!game.compareSequence){
-                console.log('Error')                
+            if(!game.compareSequence){                              
                 endGame()
+                showMessage('Game Over')
             }
         }
-   // }
+    }
 })
 
 formName.addEventListener('change', ()=>{
@@ -332,7 +390,6 @@ gameDifficulty.addEventListener('change', ()=>{
 })
 
 //Close Modal
-const modalClose = document.getElementById('modal-close')
 modalClose.addEventListener('click', () => modal.classList.remove('modal--show'))
 
 showRanking()

@@ -5,16 +5,18 @@ html(lang="en")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         title Simon says
         link(rel="stylesheet", href="/css/styles.css")
+        link(rel="shortcut icon" href="#")
     body
-        #error.error.error--hide Write your name
+        #error.error.error--hide Write your name maximun 10 characters
+        #message.message                          
         main
             #info.info
                 #score.info__score
                     p#info-username.info__username Your name
                     p#info-score.info__score 000000
                     p#info-level.info__level Level 1
-                #ranking.info__ranking                
-            #game.game
+                #ranking.info__ranking 
+            #game.game                
                 #game-board.game__board
                     div
                         #square-green.game__square.game__square--green(data-value=0)
@@ -22,20 +24,19 @@ html(lang="en")
                     div
                         #square-red.game__square.game__square--red(data-value=3)
                         #square-blue.game__square.game__square--blue(data-value=2)
-                    #square-middle.game__square.game__square--middle
-                        //<ion-icon name="play-circle-outline" class="icon" id="start-game"></ion-icon>
+                    #square-middle.game__square.game__square--middle                        
                         button#start-game.game__button <ion-icon name="play-circle-outline" class="icon"></ion-icon>
             form#simon-form.form
-                label(for="form-name") Username
+                label(for="form-name").form__label Username
                 input(type="text" placeholder="e.g. Paco")#form-name.form__field
-                label(for="game-difficulty") Difficulty
+                label(for="game-difficulty").form__label Difficulty
                 select#game-difficulty(name="difficulty").form__field.form__select
                     option(value="normal") Normal
                     option(value="hard") Hard
                     option(value="epic") Epic
             #modal.modal       
                 #modal-content.modal__content
-                    #modal-ranking
+                    #modal-ranking.modal__ranking
                     #modal-close.modal__close +
         <script type="module" src="https://unpkg.com/ionicons@5.1.2/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule="" src="https://unpkg.com/ionicons@5.1.2/dist/ionicons/ionicons.js"></script>

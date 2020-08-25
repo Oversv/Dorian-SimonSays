@@ -17,6 +17,8 @@ var btnStartGame = document.getElementById('start-game');
 var gameDifficulty = document.getElementById('game-difficulty');
 var formName = document.getElementById('form-name');
 var infoScore = document.getElementById('info-score');
+var board = document.getElementById('game-board');
+var modalClose = document.getElementById('modal-close');
 var game = {
   id: '',
   difficulty: {
@@ -24,10 +26,12 @@ var game = {
     multiplier: 1
   },
   sequence: [],
+  audio: ['green.wav', 'yellow.wav', 'blue.wav', 'red.wav'],
   playing: false,
   compareSequence: true,
   user: {
     username: '',
+    userTurn: false,
     sequence: [],
     score: 0
   },
@@ -66,6 +70,15 @@ var activeColor = function activeColor(number) {
   });
 };
 /**
+ * * Play the audio
+ * @param {number} audio is a number with the position of the audio in the array
+ */
+
+
+var playAudio = function playAudio(audio) {
+  return new Audio("audio/".concat(game.audio[audio])).play();
+};
+/**
  * * Check the Simon sequence with the user and return true if both are equals and false if are different
  * @param {array} simonSequence array with Simon sequence
  * @param {array} userSequence array with user sequence
@@ -92,13 +105,14 @@ var startRound = function startRound() {
   game.sequence = sequence(game.sequence);
   sequenceLength = game.sequence.length;
   infoLevel.textContent = "Level ".concat(game.level);
+  game.user.userTurn = false; //Block the user turn
 
   (function loop(sequenceLength) {
     setTimeout(function () {
       activeColor(game.sequence[count]);
+      playAudio(game.sequence[count]);
       count++;
-      if (--sequenceLength) //When rounds is != 0 the condition is true 
-        loop(sequenceLength);
+      --sequenceLength ? loop(sequenceLength) : game.user.userTurn = true;
     }, time);
   })(sequenceLength);
 };
@@ -164,7 +178,7 @@ var endGame = function endGame() {
   gameDifficulty.removeAttribute('disabled');
 };
 /**
- * *Upadete the score when finish each round
+ * * Upadete the score when finish each round
  */
 
 
@@ -203,7 +217,7 @@ var saveRanking = function saveRanking(game) {
   localStorage.setItem('simonRanking', JSON.stringify(newLocalStorage));
 };
 /**
- * * Order the local storage for levels and scores, and show
+ * * Order the local storage for levels and scores, and show it
  */
 
 
@@ -228,11 +242,15 @@ var showRanking = function showRanking() {
       fragment.appendChild(p);
     }
 
+    var div = document.createElement('div');
+    div.setAttribute('class', 'info__button-container');
     var button = document.createElement('button');
     button.textContent = 'See More';
     button.setAttribute('id', 'ranking-details');
+    button.setAttribute('class', 'info__button');
     button.setAttribute('onclick', 'showModal()');
-    fragment.appendChild(button);
+    div.appendChild(button);
+    fragment.appendChild(div);
     ranking.appendChild(fragment);
   }
 };
@@ -251,18 +269,48 @@ var showModal = function showModal() {
   var rankingItems = 50;
   modal.classList.add('modal--show');
   modalRanking.innerHTML = '';
+  var gridColumnsNames = ['Pos', 'Name', 'Lvl', 'Score', 'Date'];
+  gridColumnsNames.forEach(function (e) {
+    var p = document.createElement('p');
+    p.textContent = e;
+    p.setAttribute('class', 'modal__title');
+    fragment.appendChild(p);
+  });
 
   if (allLocalStorage.length < 50) {
     rankingItems = allLocalStorage.length;
   }
 
   for (var i = 0; i < rankingItems; i++) {
-    var p = document.createElement('p');
-    p.textContent = "\n            ".concat(i + 1, "\xBA ").concat(allLocalStorage[i].username, " - Level ").concat(allLocalStorage[i].level, " - Score ").concat(allLocalStorage[i].score, " - Date ").concat(allLocalStorage[i].date, " \n        ");
-    fragment.appendChild(p);
+    var col1 = document.createElement('p');
+    var col2 = document.createElement('p');
+    var col3 = document.createElement('p');
+    var col4 = document.createElement('p');
+    var col5 = document.createElement('p');
+    col1.textContent = "".concat(i + 1, "\xBA");
+    col2.textContent = allLocalStorage[i].username;
+    col3.textContent = allLocalStorage[i].level;
+    col4.textContent = allLocalStorage[i].score;
+    col5.textContent = allLocalStorage[i].date;
+    fragment.appendChild(col1);
+    fragment.appendChild(col2);
+    fragment.appendChild(col3);
+    fragment.appendChild(col4);
+    fragment.appendChild(col5);
   }
 
   modalRanking.appendChild(fragment);
+};
+
+var showMessage = function showMessage(text) {
+  var message = document.getElementById('message');
+  var messageType = "";
+  message.textContent = text;
+  text === "Next Round!!" ? messageType = "message--round" : messageType = "message--end";
+  message.classList.add(messageType);
+  setTimeout(function () {
+    message.classList.remove(messageType);
+  }, 1000);
 };
 /******************** 
   *** Listeners *** 
@@ -273,7 +321,7 @@ btnStartGame.addEventListener('click', function () {
   var error = document.getElementById('error');
   infoScore.textContent = game.user.score.toString().padStart(6, '0');
 
-  if (formName.value.trim().length === 0) {
+  if (formName.value.trim().length === 0 || formName.value.trim().length > 10) {
     error.classList.remove('error--hide');
     formName.focus();
   } else {
@@ -288,40 +336,39 @@ btnStartGame.addEventListener('click', function () {
       gameDifficulty.setAttribute('disabled', '');
     }
   }
-}); //TODO los sonidos
-//TODO mirar de meter un grid en la modal y añadir la difiucultad, añadir el scroll para la modal mirar el log the piedra papel
-
-var board = document.getElementById('game-board');
+});
 board.addEventListener('click', function (e) {
-  // if(game.compareSequence){ //! Creo que no hace falta
-  if (e.target.getAttribute('data-value')) {
-    var colorPressed = Number(e.target.getAttribute('data-value'));
-    game.user.sequence.push(colorPressed);
-    game.compareSequence = checkSequence(game.sequence, game.user.sequence);
-    activeColor(colorPressed);
+  //Only when is the turn of the user
+  if (game.user.userTurn) {
+    if (e.target.getAttribute('data-value')) {
+      var colorPressed = Number(e.target.getAttribute('data-value'));
+      game.user.sequence.push(colorPressed);
+      game.compareSequence = checkSequence(game.sequence, game.user.sequence);
+      activeColor(colorPressed);
+      playAudio(colorPressed);
 
-    if (game.compareSequence) {
-      updateScore();
-    } //Next Round
-
-
-    if (game.compareSequence && game.sequence.length === game.user.sequence.length) {
-      console.log("Next Round");
-      saveRanking(game);
-      showRanking();
-      reset();
-      game.level++; //Delay between rounds
-
-      setTimeout(startRound, 1000);
-    } //Eror and game over :(
+      if (game.compareSequence) {
+        updateScore();
+      } //Next Round
 
 
-    if (!game.compareSequence) {
-      console.log('Error');
-      endGame();
+      if (game.compareSequence && game.sequence.length === game.user.sequence.length) {
+        saveRanking(game);
+        showRanking();
+        reset();
+        showMessage('Next Round!!');
+        game.level++; //Delay between rounds
+
+        setTimeout(startRound, 1000);
+      } //Eror and game over :(
+
+
+      if (!game.compareSequence) {
+        endGame();
+        showMessage('Game Over');
+      }
     }
-  } // }
-
+  }
 });
 formName.addEventListener('change', function () {
   var infoUsername = document.getElementById('info-username');
@@ -334,7 +381,6 @@ gameDifficulty.addEventListener('change', function () {
   }
 }); //Close Modal
 
-var modalClose = document.getElementById('modal-close');
 modalClose.addEventListener('click', function () {
   return modal.classList.remove('modal--show');
 });

@@ -10,24 +10,40 @@
     background-color: rgba(0,0,0,.7); /* important use alpha */
     transform: scale(0);
     transition: transform .3s;
-}
-.modal--show{
-    transform: scale(1);
-}
-.modal__content{
-    position: relative; /* important for the situation of modal__close */
-    width: 500px;
-    height: 500px;
-    padding: 10px;   
-    background-color: white;    
-}
-.modal__close{
-    position: absolute;
-    top: 0;
-    right: 0;    
-    font-size: 2em;
-    color: red;
-    font-weight: bold;
-    transform: rotate(45deg);
-    cursor: pointer;
+
+    &--show{
+        transform: scale(1);
+    }
+
+    &__content{
+        position: relative; /* important for the situation of modal__close */
+        width:  500px;
+        height: 100vh;
+        padding: 10px;   
+        background-color: $third;
+        overflow-y: auto;
+    }
+
+    &__ranking{
+        display: grid;
+        grid-template-columns: auto auto auto auto auto;       
+        justify-items: center;   
+    }
+
+    &__title{
+        color: $first;
+        font-weight: bold;
+        border-bottom: 2px solid $first;   
+    }
+
+    &__close{
+        position: absolute;
+        top: 0;
+        right: 10px;    
+        font-size: 2em;
+        color: $second;
+        font-weight: bold;
+        transform: rotate(45deg);
+        cursor: pointer;
+    }
 }
