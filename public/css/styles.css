@@ -5,20 +5,21 @@
   box-sizing: border-box; }
 
 body {
-  background-color: #00adb5;
+  background: #fafafa;
+  background: radial-gradient(circle, #fafafa 0%, #03aefa 50%, #004a7c 100%);
   margin: 0px; }
 
 .info {
   display: flex;
   justify-content: space-between;
   padding: 0 30px;
-  color: #222831;
+  color: #e8f1f5;
   font-weight: bold; }
   .info__button-container {
     text-align: center; }
   .info__button {
-    background-color: #222831;
-    color: #eeeeee;
+    background-color: #004a7c;
+    color: #e8f1f5;
     font-weight: bold;
     padding: 5px 10px;
     border-radius: 6px; }
@@ -41,16 +42,16 @@ body {
     filter: brightness(50%);
     cursor: pointer; }
     .game__square--green {
-      background-color: green;
+      background-color: #48c774;
       border-top-left-radius: 100%; }
     .game__square--yellow {
-      background-color: yellow;
+      background-color: #ffdd57;
       border-bottom-left-radius: 100%; }
     .game__square--red {
       background-color: red;
       border-top-right-radius: 100%; }
     .game__square--blue {
-      background-color: blue;
+      background-color: #007bff;
       border-bottom-right-radius: 100%; }
     .game__square--middle {
       width: 170px;
@@ -70,7 +71,7 @@ body {
   .game__button {
     background-color: transparent;
     border: none;
-    color: #eeeeee;
+    color: #e8f1f5;
     cursor: pointer; }
     .game__button--disabled {
       color: transparent;
@@ -80,7 +81,7 @@ body {
   font-size: 128px; }
 
 .active {
-  filter: brightness(200%); }
+  filter: brightness(100%); }
 
 .form {
   display: flex;
@@ -88,7 +89,7 @@ body {
   align-items: center;
   margin-top: 20px; }
   .form__label {
-    color: #222831;
+    color: #004a7c;
     font-weight: bold;
     margin-top: 10px; }
   .form__field {
@@ -96,8 +97,9 @@ body {
     height: 30px;
     margin: 5px 0;
     border-radius: 6px;
-    background-color: #eeeeee;
-    color: #222831; }
+    background-color: #e8f1f5;
+    color: #004a7c;
+    font-weight: bold; }
 
 .error {
   position: fixed;
@@ -115,7 +117,7 @@ body {
 .message {
   position: fixed;
   background-color: green;
-  color: #eeeeee;
+  color: #e8f1f5;
   font-size: 20px;
   font-weight: bold;
   width: 100%;
@@ -152,22 +154,22 @@ body {
     width: 500px;
     height: 100vh;
     padding: 10px;
-    background-color: #eeeeee;
+    background-color: #e8f1f5;
     overflow-y: auto; }
   .modal__ranking {
     display: grid;
     grid-template-columns: auto auto auto auto auto;
     justify-items: center; }
   .modal__title {
-    color: #222831;
+    color: #004a7c;
     font-weight: bold;
-    border-bottom: 2px solid #222831; }
+    border-bottom: 2px solid #004a7c; }
   .modal__close {
     position: absolute;
     top: 0;
     right: 10px;
     font-size: 2em;
-    color: #00adb5;
+    color: #004a7c;
     font-weight: bold;
     transform: rotate(45deg);
     cursor: pointer; }

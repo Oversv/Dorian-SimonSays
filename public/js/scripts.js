@@ -12,6 +12,7 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToAr
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
+//TODO Modularizar este archivo
 var boardColors = Array.from(document.querySelectorAll('.game__square')).slice(0, 4);
 var btnStartGame = document.getElementById('start-game');
 var gameDifficulty = document.getElementById('game-difficulty');
@@ -40,7 +41,7 @@ var game = {
   ranking: []
 };
 /**
- * * Generate a random number between 0 and 3 inclusive, this represents the colors of simon
+ * * Generate a random number between 0 and 3 included, this represents Simon colours
  * @param {array} arr receive the array of game.sequence 
  */
 
@@ -52,8 +53,8 @@ var sequence = function sequence(arr) {
   return newArr;
 };
 /**
- * * Iluminate the button 
- * @param {number} number 
+ * * Light up the button 
+ * @param {number} number of the button that should be activated
  */
 
 
@@ -79,7 +80,7 @@ var playAudio = function playAudio(audio) {
   return new Audio("audio/".concat(game.audio[audio])).play();
 };
 /**
- * * Check the Simon sequence with the user and return true if both are equals and false if are different
+ * * Check the Simon sequence with the user and return true if both are equal and false if are different
  * @param {array} simonSequence array with Simon sequence
  * @param {array} userSequence array with user sequence
  */
@@ -93,7 +94,7 @@ var checkSequence = function checkSequence(simonSequence, userSequence) {
   return simon === user;
 };
 /**
- * * Fill de array of game.sequence, with 1 number per level. Level 1 = [n], Level 2 = [n,n] ... 
+ * * Fill the array of game.sequence, with 1 number per level. Level 1 = [n], Level 2 = [n,n] ... 
  */
 
 
@@ -154,7 +155,7 @@ var selectDifficulty = function selectDifficulty() {
   return result;
 };
 /**
- * * Reset the user sequence when finish de round
+ * * Reset the user sequence when the round ends
  */
 
 
@@ -178,7 +179,7 @@ var endGame = function endGame() {
   gameDifficulty.removeAttribute('disabled');
 };
 /**
- * * Upadete the score when finish each round
+ * * Update the score when each round ends
  */
 
 
@@ -188,7 +189,7 @@ var updateScore = function updateScore() {
 };
 /**
  * * Save in the local storage the ranking of the user, save(id, username, level, score and date) for each round
- * @param {object} game The object when the game save all parameters 
+ * @param {object} game The object where the game saves all parameters 
  */
 
 
@@ -217,7 +218,7 @@ var saveRanking = function saveRanking(game) {
   localStorage.setItem('simonRanking', JSON.stringify(newLocalStorage));
 };
 /**
- * * Order the local storage for levels and scores, and show it
+ * * Obtains the local storage data, sorts it by level and scores, and displays it
  */
 
 
@@ -255,7 +256,7 @@ var showRanking = function showRanking() {
   }
 };
 /**
- * * Show the modal and create the content
+ * * Shows the modal and creates the content
  */
 
 
@@ -301,6 +302,11 @@ var showModal = function showModal() {
 
   modalRanking.appendChild(fragment);
 };
+/**
+ * * displays a message when the user starts a new round or loses the game
+ * @param {string} text that will be displayed 
+ */
+
 
 var showMessage = function showMessage(text) {
   var message = document.getElementById('message');
@@ -338,7 +344,7 @@ btnStartGame.addEventListener('click', function () {
   }
 });
 board.addEventListener('click', function (e) {
-  //Only when is the turn of the user
+  //Only when it is the user's turn
   if (game.user.userTurn) {
     if (e.target.getAttribute('data-value')) {
       var colorPressed = Number(e.target.getAttribute('data-value'));
@@ -360,7 +366,7 @@ board.addEventListener('click', function (e) {
         game.level++; //Delay between rounds
 
         setTimeout(startRound, 1000);
-      } //Eror and game over :(
+      } //Error and game over :(
 
 
       if (!game.compareSequence) {
@@ -379,8 +385,7 @@ gameDifficulty.addEventListener('change', function () {
   if (!game.playing) {
     selectDifficulty();
   }
-}); //Close Modal
-
+});
 modalClose.addEventListener('click', function () {
   return modal.classList.remove('modal--show');
 });

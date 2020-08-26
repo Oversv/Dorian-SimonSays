@@ -1,3 +1,4 @@
+//TODO Modularizar este archivo
 const boardColors = Array.from(document.querySelectorAll('.game__square')).slice(0,4)
 const btnStartGame = document.getElementById('start-game')
 const gameDifficulty = document.getElementById('game-difficulty')
@@ -26,7 +27,7 @@ const game = {
     ranking: []
 }
 /**
- * * Generate a random number between 0 and 3 inclusive, this represents the colors of simon
+ * * Generate a random number between 0 and 3 included, this represents Simon colours
  * @param {array} arr receive the array of game.sequence 
  */
 const sequence = (arr) =>{
@@ -38,8 +39,8 @@ const sequence = (arr) =>{
     return newArr
 }
 /**
- * * Iluminate the button 
- * @param {number} number 
+ * * Light up the button 
+ * @param {number} number of the button that should be activated
  */
 const activeColor = number =>{
     const time = game.difficulty.time / 2  
@@ -64,7 +65,7 @@ const playAudio = audio =>{
 }
 
 /**
- * * Check the Simon sequence with the user and return true if both are equals and false if are different
+ * * Check the Simon sequence with the user and return true if both are equal and false if are different
  * @param {array} simonSequence array with Simon sequence
  * @param {array} userSequence array with user sequence
  */
@@ -77,7 +78,7 @@ const checkSequence = (simonSequence, userSequence) =>{
 }
 
 /**
- * * Fill de array of game.sequence, with 1 number per level. Level 1 = [n], Level 2 = [n,n] ... 
+ * * Fill the array of game.sequence, with 1 number per level. Level 1 = [n], Level 2 = [n,n] ... 
  */
 const startRound = () =>{
     const infoLevel = document.getElementById('info-level')    
@@ -146,7 +147,7 @@ const selectDifficulty = () =>{
 }
 
 /**
- * * Reset the user sequence when finish de round
+ * * Reset the user sequence when the round ends
  */
 const reset = () =>{
     game.user.sequence = []      
@@ -168,7 +169,7 @@ const endGame = () =>{
 }
 
 /**
- * * Upadete the score when finish each round
+ * * Update the score when each round ends
  */
 const updateScore = () =>{
     game.user.score += game.scoreBase * game.difficulty.multiplier
@@ -176,7 +177,7 @@ const updateScore = () =>{
 }
 /**
  * * Save in the local storage the ranking of the user, save(id, username, level, score and date) for each round
- * @param {object} game The object when the game save all parameters 
+ * @param {object} game The object where the game saves all parameters 
  */
 const saveRanking = (game) =>{ 
     const myDate = new Date()
@@ -203,7 +204,7 @@ const saveRanking = (game) =>{
     localStorage.setItem('simonRanking', JSON.stringify(newLocalStorage))
 }
 /**
- * * Order the local storage for levels and scores, and show it
+ * * Obtains the local storage data, sorts it by level and scores, and displays it
  */
 const showRanking = () =>{
     const ranking = document.getElementById('ranking')
@@ -228,6 +229,7 @@ const showRanking = () =>{
             `
             fragment.appendChild(p)
         }
+
         const div = document.createElement('div')
         div.setAttribute('class', 'info__button-container')
 
@@ -243,7 +245,7 @@ const showRanking = () =>{
     }
 }
 /**
- * * Show the modal and create the content
+ * * Shows the modal and creates the content
  */
 const showModal = () =>{    
     const allLocalStorage = JSON.parse(localStorage.getItem('simonRanking')).sort((a, b) => b.level - a.level || b.score - a.score);
@@ -292,6 +294,10 @@ const showModal = () =>{
     modalRanking.appendChild(fragment)
 }
 
+/**
+ * * displays a message when the user starts a new round or loses the game
+ * @param {string} text that will be displayed 
+ */
 const showMessage = text =>{
    
     const message = document.getElementById('message')    
@@ -302,7 +308,6 @@ const showMessage = text =>{
     (text === "Next Round!!")
         ? messageType = "message--round"
         : messageType = "message--end"
-
     
     message.classList.add(messageType)
 
@@ -338,7 +343,7 @@ btnStartGame.addEventListener('click', ()=>{
 
 board.addEventListener('click', (e)=>{    
     
-    //Only when is the turn of the user
+    //Only when it is the user's turn
     if(game.user.userTurn){
        
         if(e.target.getAttribute('data-value')){
@@ -365,7 +370,7 @@ board.addEventListener('click', (e)=>{
                 setTimeout(startRound, 1000)
             }
 
-            //Eror and game over :(
+            //Error and game over :(
             if(!game.compareSequence){                              
                 endGame()
                 showMessage('Game Over')
@@ -389,7 +394,6 @@ gameDifficulty.addEventListener('change', ()=>{
     }   
 })
 
-//Close Modal
 modalClose.addEventListener('click', () => modal.classList.remove('modal--show'))
 
 showRanking()
