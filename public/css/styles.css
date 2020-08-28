@@ -14,7 +14,8 @@ body {
   justify-content: space-between;
   padding: 0 30px;
   color: #e8f1f5;
-  font-weight: bold; }
+  font-weight: bold;
+  height: 150px; }
   .info__button-container {
     text-align: center; }
   .info__button {
