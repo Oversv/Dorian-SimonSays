@@ -18,6 +18,7 @@ btnStartGame.addEventListener('click', ()=>{
             game.playing = true            
             btnStartGame.setAttribute('disabled', '')
             btnStartGame.classList.add('game__button--disabled')
+            formName.setAttribute('disabled', '')
             gameDifficulty.setAttribute('disabled', '')
         }
     }
@@ -27,7 +28,7 @@ board.addEventListener('click', (e)=>{
     //Only when it is the user's turn
     if(game.user.userTurn){
        
-        if(e.target.getAttribute('data-value')){
+        if(e.target.getAttribute('data-value') && game.sequence.length === game.level){
             const colorPressed = Number(e.target.getAttribute('data-value'))
 
             game.user.sequence.push(colorPressed)           

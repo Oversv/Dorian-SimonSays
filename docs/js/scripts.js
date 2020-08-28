@@ -19,6 +19,7 @@ btnStartGame.addEventListener('click', function () {
       game.playing = true;
       btnStartGame.setAttribute('disabled', '');
       btnStartGame.classList.add('game__button--disabled');
+      formName.setAttribute('disabled', '');
       gameDifficulty.setAttribute('disabled', '');
     }
   }
@@ -26,7 +27,7 @@ btnStartGame.addEventListener('click', function () {
 board.addEventListener('click', function (e) {
   //Only when it is the user's turn
   if (game.user.userTurn) {
-    if (e.target.getAttribute('data-value')) {
+    if (e.target.getAttribute('data-value') && game.sequence.length === game.level) {
       var colorPressed = Number(e.target.getAttribute('data-value'));
       game.user.sequence.push(colorPressed);
       game.compareSequence = checkSequence(game.sequence, game.user.sequence);

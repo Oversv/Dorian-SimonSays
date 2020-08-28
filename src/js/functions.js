@@ -46,7 +46,7 @@ const checkSequence = (simonSequence, userSequence) =>{
     const long = game.user.sequence.length -1
     const simon = simonSequence[long]
     const user = userSequence[long]
-
+    
     return simon === user
 }
 
@@ -60,7 +60,7 @@ const startRound = () =>{
     let count = 0;
 
     game.sequence = sequence(game.sequence);    
-    sequenceLength = game.sequence.length;
+    sequenceLength = game.level;
     infoLevel.textContent = `Level ${game.level}`;
     game.user.userTurn = false; //Block the user turn
 
@@ -138,6 +138,7 @@ const endGame = () =>{
     game.playing = false    
     btnStartGame.removeAttribute('disabled')
     btnStartGame.classList.remove('game__button--disabled')
+    formName.removeAttribute('disabled')   
     gameDifficulty.removeAttribute('disabled')    
 }
 

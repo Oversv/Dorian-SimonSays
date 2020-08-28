@@ -75,7 +75,7 @@ var startRound = function startRound() {
   var sequenceLength;
   var count = 0;
   game.sequence = sequence(game.sequence);
-  sequenceLength = game.sequence.length;
+  sequenceLength = game.level;
   infoLevel.textContent = "Level ".concat(game.level);
   game.user.userTurn = false; //Block the user turn
 
@@ -147,6 +147,7 @@ var endGame = function endGame() {
   game.playing = false;
   btnStartGame.removeAttribute('disabled');
   btnStartGame.classList.remove('game__button--disabled');
+  formName.removeAttribute('disabled');
   gameDifficulty.removeAttribute('disabled');
 };
 /**
